@@ -1,6 +1,6 @@
 # TCI_Tools
 
-# Certification Operating Council 
+# OmniAir Consortium 
 ----------
 
 ## TCI_Msg_Generator
