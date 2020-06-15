@@ -1,0 +1,179 @@
+Branch: ChangeRequest
+TCI_20180910 implementation of OmniAir TWG CRs
+- EventHandling: added eventParamsChoice and eventParamsChoice structure
+- TCIInidication: WsmParameters: removed timeslot
+- TCICommonType: added comment deprecating d80211frame and d16093frame
+- TCISutControl/TCI2945: moved definitions from TCI29451 to TCISutControl for enableGpsInput, setLatitude, setLongitude, setElevation, setPositionalAccuracy, setSpeed, setHeading
+setAccelerationSet4Way, setGpsTime
+- TCI2945: reimported setGpsTime, etc to TCI2945 and marked their indices as deprecated.
+
+Branch: ChangeRequest
+TCI_20180312
+- TCIindication: in IpParameters added protocol
+- TCICommonTypes: in ExceptionType added explicit enumerated values
+- TCI29451: added SetGpsTime, changed tractionControlStatus, antiLockBrakeStatus, stabilityControlStatus, brakeBoostApplied, auxiliaryBrakeStatus to ENUMERATED
+
+TCI_20170814
+- TCIwsm: AddUserService. Added eventHandling field
+- TCIrespondInfo: Ipv6InterfaceInfo: defaultGateway/primaryDns/gatewayMacAddress changed to optional
+
+TCI_20170810-1
+- TCI16094: added AddTxProfile, DelTxProfile   
+
+TCI_20170810
+- TCIIP: Added new messages AddTxProfile, DelTxProfile to support IPv6 testing without WSA
+- TCIWSM: Modified AddUserService, added optional parameters  wsaChannelIdentifier, channelAccess
+- TCICommonTypes: removed unused CodingRate ENUM
+
+TCI_20170616
+- TCI16093: In Dot3Indication added {security} to eventParams
+
+TCI_20170421
+- TCI29451: added StartBsmRx, stopBsmRx, previously deleted
+- Added Test Control Interface Specification  20170421.pdf
+- Added Test Control Interface Specification  20170421_changestracked.docx
+
+TCI_20170418
+- TCI29451: fixes for ASN1 compiler errors
+- TCIDispatcher: removed reference to TCI16092
+
+TCI_20170417
+- TCI29451: revised various request messages to align to the 2945/1 test spec
+- Added Test Control Interface Specification  20170417.pdf
+- Added Test Control Interface Specification  20170417_changestracked.docx
+
+TCI_20170409-2
+- Added "Test Control Interface Specification  20170410.pdf"
+- Added "Test Control Interface Specification  20170410_changestracked.docx"
+- TCIDispatcher: removed import of TCI16092 module
+
+TCI_20170409-1
+- 1609dot3\wee.asn 
+    - Changed constraint in EdcaParameterRecord/ecwMax to 1023
+    - Changed Longitude to J2735 definition
+    - Converted tabs to spaces
+    
+TCI_20170409
+- TCIEventHandling:
+      Converted tabs to spaces
+      set default value for eventFlag - no events
+      fixed incomplete comment for eIcmp6PktRx
+- TCIwsm: StartWsaTxPerdiodic: 
+      added optional dataRate, userPriority, transmitPowerLevel
+      comments for infoElementIncluded
+- Removed TCI16092.asn module from the project, updated TCIProject.a1sproj
+
+TCI_20170407
+- Several: Converted tabs to spaces
+- TCISutControl: added new messages:
+       requestSutInfo - to request version information from Sut
+       responseInfo - to return version info from Sut
+       setTestId - provide info to SUT about the upcoming test
+- TCIresponseInfo - added defitition for the contents of the SutResponseInfo
+- TCIwsm: added comment regarding using SetWsmTxInfo, StartWsaTxPerdiodic
+- TCICommonTypes: change in comment: spelling of time units in Time64
+- TCIDispatcher: change in comment: fixed time units in time
+- TCI2945 previously checked in separately: several changes to align with changes to the 2945/1 test spec
+
+TCI_20170208
+- TCIwsm: Removed default setting for eventHandling in StartWsmRx
+- TCIDispatcher: commented out TCI16092 in Frame, which is redundant with TCI16093
+
+TCI_20160801
+- TCICommonTypes: Added enumerated ExceptionID 
+- TCIDispatcher: clarified comments for time format
+- Several: replaced types IpAddress with IPv6Address, IpPort with ServicePort from 16093.WEE module
+- Several: removed imports of IpPort and IPv6Address
+- TCIip: renamed SendIPv6Ping to StartIPv6Ping, added StopIPv6Ping
+- 16093, 16094: updates to reflect changes to StartIPv6Ping, added StopIPv6Ping
+- TCIip: created root classes IPv6RxRecord, IPv6TxRecord as base classes for IP-based messages
+
+TCI 20160406
+- 16094: defined Dot4SetWsmTxInfo, Dot4StartWsmTx.
+- 80211: defined Dot11SetWsmTxInfo, Dot11StartWsmTx. Added SetWsmTxInfo to the list of messages.
+- 16093: moved a comment to the appropriate location.
+
+
+TCI 20160404
+- TCIMsg: contrained version =1
+- 16093: defined Dot3SetWsmTxInfo, Dot3StartWsmTx
+- 29451: added missing ABSENT parameter for ConfigureBsm
+
+TCI 20160321
+- 802.11, 16094: removed MIB (per Danlaw), updated dot4ResponceInfo
+- 802.11: removed dot4 response info
+- 16093: removed MIB
+- removed MIB module
+- changed to VarLengthNumber representation  of psid
+  - imported 17419_CITSapplMgmtIDs_v1.asn
+  - wsa.asn: removed COC changes
+  - CommonTypes: updated psid type, removed VarLengthNumber
+  - 2945: updated psid definition
+- Changed to DataRate80211 imported from IEEE-1609-3-WEE
+- Renamed TCIMessages to TCIMsg
+
+TCI ASN.1 20160316
+- TCISutControl: removed comment causing compiler error
+- TCICommonTypes: changed comment regarding content of Time64 type
+- TCIwsm: fixed import references
+
+TCI ASN.1 20160315
+- TCISutControl: added RequestDeviceAvailability, removed Indication
+
+TCI ASN.1 20160314
+- 2945: merged SwRI changes
+- 2945: removed SetInitialState, import from TCIwsm
+- TCIwsm: changed ExpiryTime to used Time64
+- TCI16094: updated Dot4Indication
+- All modules: removed unnecessary IMPORTs
+- 1603: added dot3Mib
+
+TCI ASN.1 20160310
+- Accepted changes from Danlaw and SwRI
+- modified Time64
+- Extracted EventHandling into separate module
+- Some cleanup in TCIip. Changed parameter for eventHandling
+- Removed unnecessary imported types in TCIwsm
+
+TCI ASN.1 20160307
+- 2945: update from John Liming
+- 2945, TCI-wsm: updated SetInitialState
+
+TCI ASN.1 20160306
+- Major rework for all modules
+	new modules created: TCIip, TCImib, TCIwsm, TCIresponseInfo, TCIindication
+	those are imported into domain modules.
+
+TCI ASN.1 20160302
+- 16093: added RepeatRate and payload to SetWsmTxInfo as optional params
+- 16094: revised StartIPv6Tx
+- 2945: removed ToggleBsmReception
+- 2945: rearranged order of declarations
+
+20160301
+- Several modules: renamed 'exceptionMessage' to 'exception'
+- TCI16093: removed unused import module
+- Partially merged 1609.4. Compiles no error
+- Partially merged 2945. Compiles no error
+
+
+20160229
+- converted INTEGER lists to ENUMERATED
+- moved MsgID type to CommonTypes
+- moved Response to CommonTypes
+- consolidated simple data types in TCI80211
+- used 1609.3 SetWsmTxInfo, StartWsmTx, and StopWsmTx to create profile for sending BSMs.
+	Still missing BSM Rx functionality
+- renamed TCIDeviceControl to TCIsutControl. Harmonized top level data types.
+© 2020 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
