@@ -50,10 +50,11 @@ SutInfo ::= SEQUENCE {
 
 VersionInfoBlock ::= SEQUENCE OF SEQUENCE {
     componentType   INTEGER {            -- type of the component, which version is reported
-                        hardware    (0),    
-                        firmware    (1),
+                        hardware    (0),    -- overall device hardware revision
+                        firmware    (1),    -- overall device firmware revision
                         software    (2),    -- for any other software
-                        tciapp      (3)     -- for TCI application version
+                        tciapp      (3),    -- for TCI application version
+						radio		(4)     -- for PC5 radio module information
                         },
     versionId       UTF8String(SIZE(1..50)),
     releaseDate     UTF8String(SIZE(1..50)) OPTIONAL,

@@ -15,7 +15,7 @@ PduType ::= ENUMERATED {
     dIpv6payload        (5)     -- Ipv6 payload
 }
 
-Opaque ::= OCTET STRING(SIZE(0..2304))
+Opaque ::= OCTET STRING(SIZE(0..2304)) -- mtu_size 1500 for Ethernet
 HashedId8  ::= OCTET STRING (SIZE(8))
 
 /* 
@@ -102,5 +102,44 @@ Psid ::= VarLengthNumber
 RepeatRate ::= INTEGER (0..255) -- Number of messages transmitted per 5sec interval; if set to 0, transmit message one time only
 
 MsgID ::=  INTEGER(0..255)
+
+
+BandwidthPC5  ::= INTEGER (0..255)
+TXpowerPC5    ::= INTEGER(-128..127)
+EARFCN        ::= INTEGER(0..65535)
+MCS           ::= INTEGER(0..64)
+PSxCH  		  ::= ENUMERATED {
+			pscch (1),
+			pssch (2)
+}
+RBSize        ::= INTEGER(0..65535)
+RBCount       ::= INTEGER(0..65535)
+SPS           ::= INTEGER(0..65535)
+PC5Event		::= INTEGER(0..65535)
+PPPP          ::= INTEGER(0..65535)
+PacketCount ::= INTEGER(0..9223372036854775807) 
+PacketSize    ::= INTEGER(0..2040)
+RSSI          ::= RCPI
+
+/* 
+-- Channel identifier and transit parameters
+txPoolEarfcn ARFCN-ValueEUTRA-r9 OPTIONAL,
+pMax P-Max OPTIONAL,
+pppp SL-Priority-r13 OPTIONAL,
+txPool SL-TxPoolIdentity-r12 OPTIONAL,
+minMcs INTEGER (0..31) OPTIONAL, 
+maxMcs INTEGER (0..31) OPTIONAL, 
+minPdb INTEGER (0..1023) OPTIONAL, 
+-- Traffic limiting 
+mtu INTEGER (1..8192) OPTIONAL, 
+maxBwPerSec MaxBandwidthPerSec OPTIONAL, 
+minPeriodicity MinimumTrafficPeriodicity OPTIONAL, 
+-- Operational parameters 
+maxSpeed INTEGER (0..255) OPTIONAL, 
+maxRange INTEGER (1..4096) OPTIONAL, 
+maxCbr INTEGER (0..100) OPTIONAL, 
+-- Preconfiguration 
+preconfigInfo SL-V2X-Preconfiguration-r14 OPTIONAL, 
+*/
 
 END

@@ -1,0 +1,391 @@
+TCI-PC5RADIO 
+DEFINITIONS AUTOMATIC TAGS ::= 
+BEGIN
+
+IMPORTS
+SutInfo, VersionInfoBlock FROM TCI-responseInfo
+
+/*
+AdvertiserIdentifier,
+ProviderServiceContext,
+Extension, 
+MACaddress  FROM IEEE-1609-3-WEE {iso(1) identified-organization(3) ieee(111) standards-association-numbered-series-standards(2) wave-stds(1609) dot3(3) wee(1) version0(0)}
+
+ServiceInfoExts, 
+ChannelInfos, 
+RoutingAdvertisement FROM IEEE-1609-3-WSA {iso(1) identified-organization(3) ieee(111) standards-association-numbered-series-standards(2) wave-stds(1609) dot3(3) wsa(3) version0(0)}
+*/
+
+EventHandling FROM TCI-eventHandling
+
+Exception,
+Response, 
+ResultCode,
+MsgID FROM TCI-CommonTypes
+
+PduData, 
+PduType, 
+RepeatRate, 
+UserPriority, 
+Opaque, 
+HashedId8, 
+RadioInterface, 
+Psid, 
+Time64,
+BandwidthPC5,
+TXpowerPC5,
+EARFCN,
+MCS,
+PSxCH,
+RBSize,
+RBCount,
+SPS,
+PC5Event,
+PPPP,
+PacketCount,
+PacketSize,
+RSSI,
+RCPI
+FROM TCI-CommonTypes
+
+;
+
+TCIPC5RADIO ::= CHOICE{
+	request			[0]	Request,
+	response		[1]	Response,
+	indication 		[2] Indication,
+	responseInfo	[3]	ResponseInfo, 
+	exception		[4] Exception,
+	...
+	} 
+
+Request ::=  SEQUENCE {
+   messageId   MESSAGE-ID-AND-TYPE.&id({MessageTypes}),
+   value       MESSAGE-ID-AND-TYPE.&Type({MessageTypes}{@.messageId}),
+   ...
+   }
+
+MESSAGE-ID-AND-TYPE ::= CLASS {
+   &id    MsgID UNIQUE,
+   &Type
+   } WITH SYNTAX {&Type IDENTIFIED BY &id}
+
+MessageTypes MESSAGE-ID-AND-TYPE ::= {
+	{ SetInitialState	IDENTIFIED BY setInitialState } |
+	{ SetWsmTxInfo IDENTIFIED BY setWsmTxInfo} |
+	{ StartWsmTx IDENTIFIED BY startWsmTx} |
+	{ StopWsmTx IDENTIFIED BY stopWsmTx} |
+--	{ StartWsaTxPerdiodic IDENTIFIED BY startWsaTxPerdiodic} |
+--	{ StopWsaTxPeriodic IDENTIFIED BY stopWsaTxPeriodic} |
+	{ StartWsmRx IDENTIFIED BY startWsmRx} |
+	{ StopWsmRx IDENTIFIED BY stopWsmRx} |
+--	{ AddWsaProviderService IDENTIFIED BY addWsaProviderService} |
+--	{ ChangeWsaProviderService IDENTIFIED BY changeWsaProviderService} |
+--	{ DelWsaProviderService IDENTIFIED BY delWsaProviderService} |
+--	{ AddUserService IDENTIFIED BY addUserService} |
+--	{ DelUserService IDENTIFIED BY delUserService} |
+--	{ GetIPv6InterfaceInfo IDENTIFIED BY getIpv6InterfaceInfo} |
+--	{ SetIPv6Address IDENTIFIED BY setIpv6Address} |
+--	{ StartIPv6Ping IDENTIFIED BY startIpv6Ping} |
+--	{ StopIPv6Ping IDENTIFIED BY stopIpv6Ping}
+--	{ SetPC5ParameterSet IDENTIFIED BY getTxPacketCount} |
+
+	{ SetUeConfig IDENTIFIED BY setUeConfig} |
+	{ RequestTxPacketCount IDENTIFIED BY requestTxPacketCount} |
+	{ RequestRxPacketCount IDENTIFIED BY requestRxPacketCount} |   -- ?? is this applicable for radio frames, payloads, with valid security?
+	{ SendATcommand IDENTIFIED BY sendATcommand} | 
+	{ SendUeConfigXML IDENTIFIED BY sendUeConfigXML } | 
+	{ RequestSutStatus IDENTIFIED BY requestSutStatus }
+}
+
+setInitialState     					MsgID ::= 1
+setWsmTxInfo     						MsgID ::= 2
+startWsmTx     							MsgID ::= 3
+stopWsmTx		     					MsgID ::= 4
+startWsaTxPerdiodic     				MsgID ::= 5
+stopWsaTxPeriodic     					MsgID ::= 6
+startWsmRx     							MsgID ::= 7
+stopWsmRx     							MsgID ::= 8
+--addWsaProviderService		    		MsgID ::= 9
+--changeWsaProviderService				MsgID ::= 10
+--delWsaProviderService		    		MsgID ::= 11
+--addUserService							MsgID ::= 12
+--delUserService							MsgID ::= 13
+
+setUeConfig								MsgID ::= 20
+requestTxPacketCount					MsgID ::= 21
+requestRxPacketCount					MsgID ::= 22
+sendATcommand							MsgID ::= 23
+sendUeConfigXML 						MsgID ::= 24
+requestSutStatus						MsgID ::= 25
+
+SetInitialState ::= BOOLEAN (TRUE)
+
+SetUeConfig ::= SEQUENCE {
+	psxch					PSxCH,
+    txPower 				TXpowerPC5,
+    bw			    		BandwidthPC5,
+	earfcn					EARFCN,
+    mcs						MCS,
+	rbSize					RBSize,
+    rbCount					RBCount,
+	sps						SPS,  -- duplicate with repeatRate, may be coupled size 
+	event					PC5Event,
+	pppp					PPPP,
+    ...
+}
+
+SetWsmTxInfo ::= SEQUENCE{
+    psid                    Psid, -- p-encoded PSID
+    radio                   RadioInterface,
+    security                SecurityContext,
+    infoElementsIncluded    WaveElementsIncluded DEFAULT '000000000000000000000000'B, -- default no WAVE Extension Info elements included
+    expiryTime              Time64 OPTIONAL,
+    channelLoad             Opaque OPTIONAL,      -- 
+    repeatRate              RepeatRate  OPTIONAL, -- when set to 0 - one shot message, otherwise periodic with RepeatRate per 1609.3
+    payload                 Opaque OPTIONAL,
+--    timeslot                TimeSlot,
+    ...
+}
+
+StartWsmTx ::= SEQUENCE{  -- handled through WSM-WaveShortMessage.request
+    psid            Psid,
+    radio           RadioInterface,
+    repeatRate      RepeatRate, -- when set to 0 - one shot message, otherwise periodic with RepeatRate per 1609.3
+    -- 20ms 50, 100, 200, .. 1000ms, (250, 50, 25, ... 5). 
+    payload         Opaque OPTIONAL,
+    ...
+}
+
+StopWsmTx ::= SEQUENCE{
+    psid        Psid,
+    radio       RadioInterface,
+    ...
+}
+
+StartWsmRx ::= SEQUENCE{    -- uses on WME-WSMService.request; WME-ChannelService used for received WSM on the given channel timeslot with matched PSIDs
+    psid                Psid OPTIONAL, -- PSID is optional if eventHandling.rxFlag is set to receive any WSM with PSID
+    radio               RadioInterface,
+    eventHandling       EventHandling,
+    ...
+}
+
+StopWsmRx ::= SEQUENCE{
+    psid        Psid OPTIONAL,
+    radio       RadioInterface,
+    ...
+}
+
+RequestSutStatus ::= BOOLEAN (TRUE)
+
+RequestWsmTxPacketCount ::= BOOLEAN (TRUE) -- WSMP APPLICATION LEVEL PACKET COUNT, AFTER PSID FILTER (WSMs
+
+RequestWsmRxPacketCount ::= BOOLEAN (TRUE)
+
+?? hOW TO ENSURE THAT PACKET COUNT CORRESPONDS TO THE PACKETS FROM THE TEST SYSTEMS
+
+SendATcommand ::= UTF8String(SIZE(1..1400)) -- e.g. AT+CATM, AT+CCUTLE, AT+CUSPCREQ, AT+CUTCR, AT+CCBRREQ, AT+CV2XDTS, ATV1, ATV0
+-- response from SendATcommand is provided via ResponseInfo
+ATcmdInfo ::= SendATcommand
+
+SendUeConfigXML ::= SEQUENCE {
+	counter	    INTEGER (1..127),	-- counter index for the current segment
+	total		INTEGER (1..127),	-- total number of segments to be transferred
+	pdu			Opaque,             -- provide the test tool, the max pdu mtu size
+	...
+}
+
+/* 
+   ResponseInfo Messages
+*/
+
+ResponseInfo ::= SEQUENCE {
+    msgID               MsgID,  
+    resultCode          ResultCode,
+    info                InfoContent OPTIONAL, -- if exception reported, no InfoContent provided
+    exception           Exception OPTIONAL,
+    ...
+}
+
+InfoContent::= CHOICE {
+--     ipv6InterfaceInfo   [1] Ipv6InterfaceInfo,
+    sutInfo         [2] SutInfo,
+    atCmdInfo		[3] ATcmdInfo,
+    pktCount		[4] PacketCount,
+	sutStatus		[5] SutStatus,
+    ...
+}
+
+SutStatus ::= Opaque  -- to query device for Timing Confidence, to check position lock, to get UE parameters and verify against expected values
+
+/* 
+   Indication Messages
+*/
+
+Indication ::= SEQUENCE{
+	radio                   RadioInterface ( WITH COMPONENTS { ..., antenna ABSENT }), 	
+	event					Event,			
+	eventParams				EventParams OPTIONAL,
+	pdu						Pdu OPTIONAL,
+	exception				Exception OPTIONAL,
+	...
+}
+
+-- suggest where the indication...
+Event ::= ENUMERATED {
+--	eMacPktRx							(1),	-- used for 802.11 frames or PC5 Mac frames
+--	e16093PktRx							(2), 	-- inbound 1603 frame received
+	eWsmPktRx							(3), 	-- WSM received
+	eIpv6PktRx							(4), 	-- inbound IPv6 frame received
+	eIcmp6PktRx							(5),	-- inbound ICMP frame received
+	eIpv6ConfigChanged					(6),	-- IPv6 address configuration changed
+	eDot3ChannelAssigned				(7),	-- Channel assigned as per WME-Notification.indication
+	eDot3RequestMatchedAvailAppService	(8),	-- request matched with available application-service as per WME-Notification.indication
+	eDot2VerificationCompleteWithResult (9),	-- message signature verification is complete
+	exception							(15) 	-- exception reported from IUT
+    -- PROVIDE OPTION TO suppress indication
+}
+
+EventParams ::= CHOICE{
+	service			[0]		ServiceParameters,
+	wsm 		 	[1]  	WsmParameters,    -- to be used for DSRC / PC5
+--	ip			 	[2]		IpParameters,
+	d80211frame		[3]		D80211Parameters,
+	security		[4]		SecResultParams,
+	...
+}
+
+Pdu ::= SEQUENCE {
+	pduType		PduType,
+	pduData		PduData,
+	...
+}
+
+ServiceParameters ::= SEQUENCE{ -- used in EventParams
+	psid					SEQUENCE OF Psid,
+	...
+}
+
+WsmParameters ::= SEQUENCE{	-- used in EventParams			
+	psid					Psid,
+	radio					RadioInterface ( WITH COMPONENTS { ..., antenna ABSENT }),
+	wsmpVersion				INTEGER(0..15),
+--?	channelIdentifier		ChannelNumber80211, -- these come from N-type headers
+--?	dataRate				DataRate80211,
+--?	receivePowerLevel		TXpower80211,
+--?	sourceMACAddr			MACaddress,
+	rcpi					RCPI,
+	...
+}
+
+/*IpParameters ::= SEQUENCE{ -- used in EventParams
+	interfaceName			UTF8String(SIZE(1..255)),
+	sourceIPaddress			IPv6Address,
+    protocol                ENUMERATED { tcp, udp, icmpv6 }, -- Upper Layer protocol used for the IPv6 PDU provided in the same TCI indication.
+	...
+}*/
+
+D80211Parameters ::= SEQUENCE{ -- used in EventParams
+	radio					RadioInterface ( WITH COMPONENTS { ..., antenna ABSENT }),
+	rcpi					RCPI,
+	...
+}
+
+SecResultParams ::= SEQUENCE { -- used in EventParams
+	securityResultCode		SecurityResultCode,
+	description				OCTET STRING OPTIONAL,
+	...
+} 
+
+SecurityResultCode ::= ENUMERATED {		-- from dot3
+	success(1), 
+	inconsistentInputParameters(2), 
+	spduParsingInvalidInput(3), 
+	spduParsingUnsupportedCriticalInformationField(4),
+	spduParsingCertificateNotFound(5), 
+	spduParsingGenerationTimeNotAvailable(6), 
+	spduParsingGenerationLocationNotAvailable(7), 
+	spduCertificateChainNotEnoughInformationToConstructChain(8), 
+	spduCertificateChainChainEndedAtUntrustedRoot(9), 
+	spduCertificateChainChainWasTooLongForImplementation(10), 
+	spduCertificateChainCertificateRevoked(11), 
+	spduCertificateChainOverdueCRL(12), 
+	spduCertificateChainInconsistentExpiryTimes(13), 
+	spduCertificateChainInconsistentStartTimes(14), 
+	spduCertificateChainInconsistentChainPermissions(15), 
+	spduCryptoVerificationFailure(16), 
+	spduConsistencyFutureCertificateAtGenerationTime(17), 
+	spduConsistencyExpiredCertificateAtGenerationTime(18), 
+	spduConsistencyExpiryDateTooEarly(19), 
+	spduConsistencyExpiryDateTooLate(20), 
+	spduConsistencyGenerationLocationOutsideValidityRegion(21), 
+	spduConsistencyNoGenerationLocation(22), 
+	spduConsistencyUnauthorizedPSID(23), 
+	spduInternalConsistencyExpiryTimeBeforeGenerationTime(24), 
+	spduInternalConsistencyextDataHashDoesntMatch(25), 
+	spduInternalConsistencynoExtDataHashProvided(26), 
+	spduInternalConsistencynoExtDataHashPresent(27), 
+	spduLocalConsistencyPSIDsDontMatch(28), 
+	spduLocalConsistencyChainWasTooLongForSDEE(29), 
+	spduRelevanceGenerationTimeTooFarInPast(30), 
+	spduRelevanceGenerationTimeTooFarInFuture(31), 
+	spduRelevanceExpiryTimeInPast(32), 
+	spduRelevanceGenerationLocationTooDistant(33), 
+	spduRelevanceReplayedSpdu(34),
+	spduCertificateExpired (35)
+}
+
+/* 
+   Support Types
+*/
+
+
+WaveElementsIncluded ::= BIT STRING { -- created based on Table F.1 Allocated WAVE Information Element IDs 1609.3v3D6
+    transmitPowerUsed   (0),    -- WSMP-N-Header
+    twoDLocation        (1),    -- WSA header
+    threeDLocation      (2),    -- WSA header
+    advertiserId        (3),    -- WSA header
+    psc                 (4),    -- WSA Channel Info
+    ipv6Address         (5),    -- WSA Channel Info
+    servicePort         (6),    -- WSA Channel Info
+    providerMacAddress  (7),    -- WSA Channel Info
+    edcaParameterSet    (8),    -- WSA Channel Info
+    secondaryDns        (9),    -- WSA WRA
+    gatewayMacAddress   (10),   -- WSA WRA
+    channelNumber       (11),   -- WSMP-N-Header
+    dataRate            (12),   -- WSMP-N-Header
+    repeatRate          (13),   -- WSA header
+    rcpiThreshold       (14),   -- WSA Service Info
+    wsaCountThreshold   (15),   -- WSA Service Info
+    channelAccess       (16),   -- WSA Channel Info
+    wsaCountThresholdInt (17),  -- WSA Service Info
+    channelLoad         (18)
+    --- add dot3 new optional elements 
+} (SIZE(24)) 
+
+SecurityContext ::= SEQUENCE{
+    contentType             ContentType,
+    signerIdentifierType    SignerIdentifierType, 
+    certID                  HashedId8 OPTIONAL,
+    ...
+}
+
+SignerIdentifierType ::= ENUMERATED {
+    unSecure                    (0),
+    useSecProfilePerContentType (1),
+    signIncludeCertificate      (2),
+    signIncludeDigest           (3),
+    ...
+}
+
+ContentType ::= ENUMERATED {
+    mOther          (0),
+    mIeee16092Data  (1),
+    mWSA            (2),
+    mBSM            (3),
+    mMAP            (4),    
+    mSPAT           (5),        
+    mTIM            (6)
+}
+
+END

@@ -31,7 +31,8 @@ EventFlag ::= BIT STRING {
     ePsidServiceActive              (5),    -- set 1 to be notified when PSID service is activated (for any PSID) by SUT
     eWSAServiceActive               (6),    -- set 1 to be notified when PSID service is activated due to incoming WSA (for any /all PSID) by SUT
     eIpv6ConfigChanged              (7),    -- set 1 to be notified when IPv6 address configuration changed by SUT
-    verificationCompleteWithResult  (8)     -- set 1 to be  notified when message signature verification is complete by SUT
+    verificationCompleteWithResult  (8),    -- set 1 to be  notified when message signature verification is complete by SUT
+    ePC5MacPktRx                 	(9)     -- set 1 to be  notified when inbound PC5 MAC frame is received by SUT
 } 
 
 SecurityFlag ::= BIT STRING {
@@ -41,7 +42,7 @@ SecurityFlag ::= BIT STRING {
 
 EventParamsChoice ::= ENUMERATED {
       service           (0),
-      wsm               (1),
+      wsm               (1),     --used for DSCR and PC5
       ip                (2),
       d80211frame       (3),
       security          (4)

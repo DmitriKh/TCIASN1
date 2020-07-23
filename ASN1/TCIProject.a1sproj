@@ -1,4 +1,4 @@
-<OssGuiProject version="2.0" product="ASN.1 Studio" productVersion="7.1">
+<OssGuiProject version="2.0" product="ASN.1 Studio" productVersion="9.0.1">
  <Asn1Files>
   <File>TCIDispatcher.asn</File>
   <File>TCI29451.asn</File>
@@ -15,13 +15,14 @@
   <File>1609dot3/17419_CITSapplMgmtIDs_v1.asn</File>
   <File>1609dot3/wee.asn</File>
   <File>1609dot3/wsa.asn</File>
+  <File>TCIPC5RADIO.asn</File>
  </Asn1Files>
  <CompilerSettings/>
  <EncodingFiles>
   <File encRule="ASN.1 Value Notation" pduName="TCIMsg">TCI-dot3-req-Dot3SetWsmTxInfo.txt</File>
  </EncodingFiles>
  <Settings>
-  <Setting name="-noRelaxedMode" present="false"/>
+  <Setting present="false" name="-noRelaxedMode"/>
   <Setting name="-oer"/>
   <Setting name="-root"/>
   <Setting name="AUTOMATIC_ENCDEC"/>
